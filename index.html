@@ -16,7 +16,27 @@
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
   <script>
+    // ⚠️ REMPLACE CE BLOC PAR TA PROPRE CONFIGURATION FIREBASE ⚠️
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1O_C6-6kcf9TWXbfzjav_9mKl4fLybSs",
+      authDomain: "halloween-vote-5d9e6.firebaseapp.com",
+      databaseURL: "https://halloween-vote-5d9e6-default-rtdb.firebaseio.com",
+      projectId: "halloween-vote-5d9e6",
+      storageBucket: "halloween-vote-5d9e6.firebasestorage.app",
+      messagingSenderId: "401194849815",
+      appId: "1:401194849815:web:87de7d4b923a5e73e12e52",
+      measurementId: "G-581PCCRB79"
+    };
+
+    // Initialisation Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     tailwind.config = {
       theme: {
         extend: {
@@ -61,7 +81,6 @@
       text-shadow: 0 0 10px rgba(255, 102, 0, 0.7), 0 0 20px rgba(255, 102, 0, 0.4);
     }
 
-    /* Floating Animation for decorative items */
     @keyframes float {
       0% { transform: translateY(0px) rotate(0deg); }
       50% { transform: translateY(-10px) rotate(5deg); }
@@ -89,7 +108,6 @@
         </h1>
       </div>
       
-      <!-- Navigation Tabs -->
       <nav class="flex items-center gap-1 md:gap-2">
         <button id="nav-home" onclick="switchTab('home')" class="px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 bg-spooky-orange text-black">
           <i class="fa-solid fa-vote-yea"></i> Vote
@@ -107,28 +125,26 @@
   <!-- Main Container -->
   <main class="max-w-5xl mx-auto px-4 py-8 flex-grow w-full">
 
-    <!-- HOME TAB (Vote + INSCRIPTION DU COSTUME) -->
+    <!-- HOME TAB -->
     <section id="tab-home" class="space-y-10">
       
-      <!-- Hero Banner & Vote Instructions -->
       <div class="text-center space-y-3 max-w-2xl mx-auto">
         <span class="inline-block px-3 py-1 bg-spooky-purple/30 border border-spooky-lightpurple/40 text-spooky-lightpurple text-xs tracking-widest uppercase font-bold rounded-full">
-          Édition Épouvantable
+          Édition En Direct 🔥
         </span>
         <h2 class="text-3xl md:text-5xl font-black tracking-tight text-white">
           Votez pour le <span class="text-spooky-orange">Meilleur Costume</span>
         </h2>
         <p class="text-gray-400 text-sm md:text-base">
-          Découvrez les participants, inscrivez votre costume et attribuez vos votes aux créations les plus terrifiantes !
+          Inscrivez votre costume et votez ! Les résultats se mettent à jour automatiquement en temps réel sur tous les écrans.
         </p>
       </div>
 
-      <!-- Live Voting Status Warning -->
       <div id="voting-closed-banner" class="hidden bg-red-950/60 border border-red-600/50 text-red-200 p-4 rounded-xl text-center font-semibold text-sm animate-pulse">
         🔒 Les votes sont actuellement fermés par l'organisateur !
       </div>
 
-      <!-- ADD COSTUME FORM (Directement sur la Home Page) -->
+      <!-- ADD COSTUME FORM -->
       <div class="bg-spooky-dark/90 border border-spooky-purple/40 rounded-2xl p-6 glow-purple space-y-6">
         <div class="flex items-center gap-3 border-b border-purple-900/50 pb-4">
           <span class="text-2xl">✨</span>
@@ -157,9 +173,7 @@
 
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Avatar ou Photo</label>
-            <div class="grid grid-cols-5 md:grid-cols-10 gap-2 mb-3" id="avatar-selector">
-              <!-- Dynamically filled with Spooky Avatars -->
-            </div>
+            <div class="grid grid-cols-5 md:grid-cols-10 gap-2 mb-3" id="avatar-selector"></div>
             <input type="hidden" id="selected-avatar" value="👻">
             
             <div class="mt-2">
@@ -184,12 +198,8 @@
           </span>
         </div>
 
-        <!-- Grid -->
-        <div id="costumes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Dynamically Populated -->
-        </div>
+        <div id="costumes-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-        <!-- Empty State -->
         <div id="empty-state" class="hidden text-center py-12 bg-spooky-dark/40 border border-dashed border-gray-800 rounded-2xl">
           <p class="text-4xl mb-2">🕷️</p>
           <p class="text-gray-400 text-sm">Aucun costume n'a encore été inscrit ! Soyez le premier à remplir le formulaire ci-dessus.</p>
@@ -198,7 +208,7 @@
 
     </section>
 
-    <!-- PODIUM / CLASSEMENT TAB -->
+    <!-- PODIUM TAB -->
     <section id="tab-podium" class="hidden space-y-8">
       <div class="text-center space-y-2 max-w-xl mx-auto">
         <h2 class="text-3xl md:text-4xl font-black text-white font-scary text-spooky-orange scary-text-shadow">
@@ -207,7 +217,6 @@
         <p class="text-gray-400 text-sm">Classement en direct des costumes les plus effrayants et créatifs.</p>
       </div>
 
-      <!-- Top 3 Podium Visual -->
       <div id="podium-top3" class="grid grid-cols-3 gap-2 md:gap-4 items-end pt-8 pb-4 max-w-2xl mx-auto">
         <!-- 2nd Place -->
         <div id="podium-2" class="flex flex-col items-center">
@@ -218,9 +227,7 @@
             <p id="podium-2-title" class="text-[10px] text-gray-500 truncate max-w-[90px] md:max-w-[120px]">-</p>
             <span id="podium-2-votes" class="inline-block mt-1 bg-purple-900/60 px-2 py-0.5 rounded text-[10px] font-extrabold text-purple-300">0 pts</span>
           </div>
-          <div class="w-full bg-slate-800 border-t-2 border-slate-400 h-28 md:h-36 rounded-t-lg flex items-center justify-center font-black text-2xl text-slate-500">
-            2
-          </div>
+          <div class="w-full bg-slate-800 border-t-2 border-slate-400 h-28 md:h-36 rounded-t-lg flex items-center justify-center font-black text-2xl text-slate-500">2</div>
         </div>
 
         <!-- 1st Place -->
@@ -232,9 +239,7 @@
             <p id="podium-1-title" class="text-xs text-gray-400 truncate max-w-[100px] md:max-w-[140px]">-</p>
             <span id="podium-1-votes" class="inline-block mt-1 bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 rounded-full text-xs font-black text-spooky-yellow">0 pts</span>
           </div>
-          <div class="w-full bg-gradient-to-t from-amber-700 to-spooky-yellow border-t-2 border-amber-300 h-36 md:h-48 rounded-t-lg flex items-center justify-center font-black text-3xl text-black shadow-lg shadow-amber-500/20">
-            1
-          </div>
+          <div class="w-full bg-gradient-to-t from-amber-700 to-spooky-yellow border-t-2 border-amber-300 h-36 md:h-48 rounded-t-lg flex items-center justify-center font-black text-3xl text-black shadow-lg shadow-amber-500/20">1</div>
         </div>
 
         <!-- 3rd Place -->
@@ -246,74 +251,58 @@
             <p id="podium-3-title" class="text-[10px] text-gray-500 truncate max-w-[90px] md:max-w-[120px]">-</p>
             <span id="podium-3-votes" class="inline-block mt-1 bg-purple-900/60 px-2 py-0.5 rounded text-[10px] font-extrabold text-purple-300">0 pts</span>
           </div>
-          <div class="w-full bg-amber-950/80 border-t-2 border-amber-800 h-20 md:h-28 rounded-t-lg flex items-center justify-center font-black text-2xl text-amber-800">
-            3
-          </div>
+          <div class="w-full bg-amber-950/80 border-t-2 border-amber-800 h-20 md:h-28 rounded-t-lg flex items-center justify-center font-black text-2xl text-amber-800">3</div>
         </div>
       </div>
 
-      <!-- Complete Leaderboard List -->
       <div class="bg-spooky-dark/80 border border-purple-900/40 rounded-2xl p-4 md:p-6 space-y-3 max-w-2xl mx-auto">
-        <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2">
-          Classement complet
-        </h3>
-        <div id="full-leaderboard-list" class="space-y-2">
-          <!-- Dynamically filled -->
-        </div>
+        <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2">Classement complet</h3>
+        <div id="full-leaderboard-list" class="space-y-2"></div>
       </div>
     </section>
 
     <!-- ADMIN TAB -->
     <section id="tab-admin" class="hidden max-w-3xl mx-auto space-y-8">
       
-      <!-- Password Prompt Card (Visible initially if not logged in) -->
       <div id="admin-login-card" class="bg-spooky-dark border border-spooky-purple/50 rounded-2xl p-6 md:p-8 text-center space-y-4 max-w-md mx-auto glow-purple">
         <div class="text-4xl">🔐</div>
         <h2 class="text-2xl font-bold text-white">Accès Administrateur</h2>
-        <p class="text-xs text-gray-400">Veuillez entrer le mot de passe pour gérer la soirée et les costumes.</p>
+        <p class="text-xs text-gray-400">Veuillez entrer le mot de passe pour gérer la soirée.</p>
         
         <form onsubmit="handleAdminLogin(event)" class="space-y-3">
           <input type="password" id="admin-password-input" placeholder="Mot de passe" class="w-full bg-slate-900 border border-purple-900/80 rounded-xl px-4 py-2.5 text-center text-white focus:outline-none focus:border-spooky-orange">
           <p id="admin-login-error" class="text-xs text-red-400 hidden">Mot de passe incorrect !</p>
-          <button type="submit" class="w-full bg-spooky-purple hover:bg-spooky-lightpurple text-white font-bold py-2.5 rounded-xl transition text-sm">
-            Déverrouiller
-          </button>
+          <button type="submit" class="w-full bg-spooky-purple hover:bg-spooky-lightpurple text-white font-bold py-2.5 rounded-xl transition text-sm">Déverrouiller</button>
         </form>
       </div>
 
-      <!-- Admin Dashboard Content (Hidden by default until login) -->
       <div id="admin-dashboard-content" class="hidden space-y-8">
-        
         <div class="flex justify-between items-center border-b border-purple-900/50 pb-4">
           <div>
             <h2 class="text-2xl font-extrabold text-white">Panneau de Contrôle Admin</h2>
-            <p class="text-xs text-gray-400">Connecté en tant qu'organisateur</p>
+            <p class="text-xs text-gray-400">Connecté en temps réel à Firebase</p>
           </div>
           <button onclick="adminLogout()" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg transition">
             <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
           </button>
         </div>
 
-        <!-- MANAGE & EDIT COSTUMES SECTION -->
+        <!-- MANAGE COSTUMES -->
         <div class="bg-spooky-dark/90 border border-purple-900/40 rounded-2xl p-6 space-y-4">
           <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-pen-to-square text-spooky-orange"></i> Gestion et Modification des Costumes
+            <i class="fa-solid fa-pen-to-square text-spooky-orange"></i> Gestion des Costumes
           </h3>
-          <p class="text-xs text-gray-400">Modifiez le nom, la description, l'avatar ou supprimez les participants si besoin.</p>
-
-          <div id="admin-costumes-list" class="space-y-3">
-            <!-- Dynamically populated admin list -->
-          </div>
+          <div id="admin-costumes-list" class="space-y-3"></div>
         </div>
 
-        <!-- QR CODE GENERATOR SECTION -->
+        <!-- QR CODE GENERATOR -->
         <div class="bg-spooky-dark/90 border border-spooky-orange/40 rounded-2xl p-6 glow-orange space-y-4">
           <div class="flex justify-between items-start">
             <div>
               <h3 class="text-lg font-bold text-spooky-orange flex items-center gap-2">
                 <i class="fa-solid fa-qrcode"></i> Code QR pour les Votants
               </h3>
-              <p class="text-xs text-gray-400">Affichez ou projetez ce code QR pour que vos invités puissent voter immédiatement.</p>
+              <p class="text-xs text-gray-400">Affichez ce code QR aux invités.</p>
             </div>
             <button onclick="openFullscreenQR()" class="bg-spooky-orange hover:bg-orange-600 text-black text-xs font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1">
               <i class="fa-solid fa-expand"></i> Projeter
@@ -321,20 +310,13 @@
           </div>
 
           <div class="flex flex-col md:flex-row items-center gap-6 pt-2">
-            <div id="qrcode-container" class="bg-white p-3 rounded-xl shadow-lg flex-shrink-0">
-              <!-- QR Code JS generated here -->
-            </div>
+            <div id="qrcode-container" class="bg-white p-3 rounded-xl shadow-lg flex-shrink-0"></div>
             <div class="space-y-3 w-full">
               <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400">URL du site</label>
               <div class="flex gap-2">
                 <input type="text" id="qr-url-input" class="w-full bg-slate-900 border border-purple-900/60 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-spooky-orange" value="">
-                <button onclick="updateQRCode()" class="bg-purple-900/80 hover:bg-purple-800 text-purple-200 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap">
-                  Mettre à jour
-                </button>
+                <button onclick="updateQRCode()" class="bg-purple-900/80 hover:bg-purple-800 text-purple-200 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap">Mettre à jour</button>
               </div>
-              <p class="text-[11px] text-gray-500">
-                L'URL actuelle est automatiquement détectée.
-              </p>
             </div>
           </div>
         </div>
@@ -346,34 +328,27 @@
           </h3>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Max Votes Setting -->
             <div class="bg-slate-900/80 p-4 rounded-xl border border-purple-900/30 space-y-2">
-              <label class="block text-xs font-bold text-gray-300">Nombre max de votes par personne</label>
+              <label class="block text-xs font-bold text-gray-300">Max votes par personne</label>
               <div class="flex items-center gap-3">
                 <input type="number" id="setting-max-votes" min="1" max="10" value="3" class="w-20 bg-slate-950 border border-purple-800 rounded-lg px-3 py-1.5 text-center text-sm font-bold text-white">
-                <button onclick="saveMaxVotesSetting()" class="bg-spooky-purple hover:bg-spooky-lightpurple text-white text-xs px-3 py-2 rounded-lg font-bold transition">
-                  Enregistrer
-                </button>
+                <button onclick="saveMaxVotesSetting()" class="bg-spooky-purple hover:bg-spooky-lightpurple text-white text-xs px-3 py-2 rounded-lg font-bold transition">Enregistrer</button>
               </div>
-              <p class="text-[11px] text-gray-500">Limite le nombre de costumes qu'une même personne peut soutenir.</p>
             </div>
 
-            <!-- Lock Voting Toggle -->
             <div class="bg-slate-900/80 p-4 rounded-xl border border-purple-900/30 space-y-2">
               <label class="block text-xs font-bold text-gray-300">État du Scrutin</label>
               <button id="toggle-voting-btn" onclick="toggleVotingStatus()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-unlock"></i> Votes Ouverts (Cliquer pour fermer)
+                <i class="fa-solid fa-unlock"></i> Votes Ouverts
               </button>
-              <p class="text-[11px] text-gray-500">Permet de figer les votes avant d'annoncer les gagnants.</p>
             </div>
           </div>
 
-          <!-- Danger Zone -->
           <div class="pt-4 border-t border-red-950/50 space-y-2">
             <h4 class="text-xs font-bold uppercase text-red-400 tracking-wider">Zone de Danger</h4>
             <div class="flex flex-wrap gap-3">
               <button onclick="resetAllVotes()" class="bg-red-950/60 hover:bg-red-900 border border-red-700/50 text-red-300 text-xs px-4 py-2 rounded-xl font-semibold transition">
-                <i class="fa-solid fa-rotate-left"></i> Réinitialiser les scores à zero
+                <i class="fa-solid fa-rotate-left"></i> Réinitialiser les scores à zéro
               </button>
               <button onclick="clearAllCostumes()" class="bg-red-950/90 hover:bg-red-900 border border-red-600 text-red-200 text-xs px-4 py-2 rounded-xl font-semibold transition">
                 <i class="fa-solid fa-trash"></i> Supprimer tous les costumes
@@ -388,7 +363,7 @@
 
   </main>
 
-  <!-- EDIT COSTUME MODAL (ADMIN) -->
+  <!-- EDIT MODAL -->
   <div id="edit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-spooky-dark border border-spooky-purple rounded-2xl p-6 max-w-lg w-full space-y-4 glow-purple">
       <div class="flex justify-between items-center border-b border-purple-900/50 pb-3">
@@ -419,7 +394,7 @@
           <input type="url" id="edit-image-url" class="w-full bg-slate-900 border border-purple-900/60 rounded-xl px-3 py-2 text-xs text-white">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-gray-400 mb-1">Nombre de votes (Ajustement direct)</label>
+          <label class="block text-xs font-semibold text-gray-400 mb-1">Votes</label>
           <input type="number" id="edit-votes" min="0" class="w-full bg-slate-900 border border-purple-900/60 rounded-xl px-3 py-2 text-sm text-white">
         </div>
 
@@ -431,97 +406,87 @@
     </div>
   </div>
 
-  <!-- Fullscreen QR Overlay -->
+  <!-- QR MODAL -->
   <div id="qr-modal" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 hidden flex flex-col items-center justify-center p-6 text-center space-y-6">
     <button onclick="closeFullscreenQR()" class="absolute top-6 right-6 text-gray-400 hover:text-white text-2xl">
       <i class="fa-solid fa-xmark"></i>
     </button>
-
     <div class="space-y-2">
       <span class="text-5xl">🎃</span>
-      <h2 class="font-scary text-4xl md:text-6xl text-spooky-orange scary-text-shadow">
-        Scannez pour Voter !
-      </h2>
+      <h2 class="font-scary text-4xl md:text-6xl text-spooky-orange scary-text-shadow">Scannez pour Voter !</h2>
       <p class="text-gray-300 text-sm md:text-base">Concours du Meilleur Costume d'Halloween</p>
     </div>
-
-    <div id="modal-qrcode-container" class="bg-white p-6 rounded-3xl shadow-2xl border-4 border-spooky-orange">
-      <!-- High res QR injected here -->
-    </div>
-
-    <p class="text-xs text-gray-400 max-w-sm">Ouvrez l'appareil photo de votre téléphone et pointez vers l'écran pour accéder au bulletin de vote.</p>
+    <div id="modal-qrcode-container" class="bg-white p-6 rounded-3xl shadow-2xl border-4 border-spooky-orange"></div>
   </div>
 
-  <!-- Footer -->
   <footer class="border-t border-purple-900/30 bg-spooky-dark/40 py-6 mt-12 text-center text-xs text-gray-500">
-    <p>🎃 Concours de Costumes d'Halloween — Prêt pour l'hébergement web</p>
+    <p>🎃 Concours d'Halloween — Connecté en temps réel avec Firebase</p>
   </footer>
 
-  <!-- Application Logic -->
+  <!-- App Script -->
   <script>
-    // --- STATE MANAGEMENT ---
     const AVATARS = ['👻', '🎃', '🦇', '🧛‍♂️', '🧟‍♀️', '🥷', '🧙‍♀️', '🤡', '💀', '🤖', '👽', '🐺', '🕷️', '👹', '🐱'];
     
-    let costumes = [
-      { id: '1', participant: 'Sophie', name: 'Sorcière Gothique', desc: 'Chapeau pointu et balai vintage', avatar: '🧙‍♀️', imageUrl: '', votes: 8 },
-      { id: '2', participant: 'Marc', name: 'Cyberpunk Zombie', desc: 'Lumières néon et maquillage horrifique', avatar: '🧟‍♀️', imageUrl: '', votes: 12 },
-      { id: '3', participant: 'Julie & Thomas', name: 'Duo Fantômes Classic', desc: 'Les célèbres draps blancs troués', avatar: '👻', imageUrl: '', votes: 5 }
-    ];
-
-    let settings = {
-      maxVotesPerUser: 3,
-      votingOpen: true
-    };
-
+    let costumes = [];
+    let settings = { maxVotesPerUser: 3, votingOpen: true };
     let userVotedIds = [];
     let isAdminAuthenticated = false;
 
-    // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', () => {
-      loadLocalStorage();
+      loadUserVotesFromLocal();
       renderAvatarSelector();
-      renderCostumes();
-      renderLeaderboard();
       setupQRDefaultURL();
-      updateVoteCounterUI();
-
-      // Check voting closed status
-      if (!settings.votingOpen) {
-        document.getElementById('voting-closed-banner').classList.remove('hidden');
-      }
+      listenToFirebase();
     });
 
-    function loadLocalStorage() {
-      const savedCostumes = localStorage.getItem('spooky_costumes');
-      if (savedCostumes) costumes = JSON.parse(savedCostumes);
+    // FIREBASE REALTIME LISTENERS
+    function listenToFirebase() {
+      // Costumes
+      db.ref('costumes').on('value', snapshot => {
+        const data = snapshot.val();
+        costumes = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+        renderCostumes();
+        renderLeaderboard();
+        if (isAdminAuthenticated) renderAdminCostumeList();
+      });
 
-      const savedSettings = localStorage.getItem('spooky_settings');
-      if (savedSettings) settings = JSON.parse(savedSettings);
-
-      const savedUserVotes = localStorage.getItem('spooky_user_votes');
-      if (savedUserVotes) userVotedIds = JSON.parse(savedUserVotes);
-
-      document.getElementById('setting-max-votes').value = settings.maxVotesPerUser;
-      updateAdminVotingBtnUI();
+      // Settings
+      db.ref('settings').on('value', snapshot => {
+        const data = snapshot.val();
+        if (data) {
+          settings = data;
+          document.getElementById('setting-max-votes').value = settings.maxVotesPerUser || 3;
+          updateAdminVotingBtnUI();
+          
+          const banner = document.getElementById('voting-closed-banner');
+          if (settings.votingOpen) {
+            banner.classList.add('hidden');
+          } else {
+            banner.classList.remove('hidden');
+          }
+        }
+        renderCostumes();
+        updateVoteCounterUI();
+      });
     }
 
-    function saveData() {
-      localStorage.setItem('spooky_costumes', JSON.stringify(costumes));
-      localStorage.setItem('spooky_settings', JSON.stringify(settings));
+    function loadUserVotesFromLocal() {
+      const saved = localStorage.getItem('spooky_user_votes');
+      if (saved) userVotedIds = JSON.parse(saved);
+    }
+
+    function saveUserVotesToLocal() {
       localStorage.setItem('spooky_user_votes', JSON.stringify(userVotedIds));
     }
 
-    // --- NAVIGATION ---
     function switchTab(tabName) {
       ['home', 'podium', 'admin'].forEach(tab => {
         document.getElementById(`tab-${tab}`).classList.add('hidden');
-        const navBtn = document.getElementById(`nav-${tab}`);
-        navBtn.className = "px-3 py-1.5 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-purple-950/50 flex items-center gap-1.5";
+        document.getElementById(`nav-${tab}`).className = "px-3 py-1.5 rounded-lg text-sm font-semibold transition text-gray-300 hover:text-white hover:bg-purple-950/50 flex items-center gap-1.5";
       });
 
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-      const activeNav = document.getElementById(`nav-${tabName}`);
-      activeNav.className = "px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 bg-spooky-orange text-black";
+      document.getElementById(`nav-${tabName}`).className = "px-3 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 bg-spooky-orange text-black";
 
       if (tabName === 'podium') renderLeaderboard();
       if (tabName === 'admin' && isAdminAuthenticated) {
@@ -530,7 +495,6 @@
       }
     }
 
-    // --- AVATAR SELECTOR ---
     function renderAvatarSelector() {
       const container = document.getElementById('avatar-selector');
       container.innerHTML = AVATARS.map((emoji, index) => `
@@ -543,16 +507,12 @@
 
     function selectAvatar(emoji, element) {
       document.getElementById('selected-avatar').value = emoji;
-      document.querySelectorAll('.avatar-btn').forEach(btn => {
-        btn.classList.remove('border-spooky-orange', 'bg-purple-950/50');
-      });
+      document.querySelectorAll('.avatar-btn').forEach(btn => btn.classList.remove('border-spooky-orange', 'bg-purple-950/50'));
       element.classList.add('border-spooky-orange', 'bg-purple-950/50');
     }
 
-    // --- COSTUME ADDITION (PUBLIC) ---
     function handleAddCostume(e) {
       e.preventDefault();
-      
       const participant = document.getElementById('participant-name').value.trim();
       const name = document.getElementById('costume-name').value.trim();
       const desc = document.getElementById('costume-desc').value.trim();
@@ -561,30 +521,22 @@
 
       if (!participant || !name) return;
 
-      const newCostume = {
-        id: Date.now().toString(),
+      const newRef = db.ref('costumes').push();
+      newRef.set({
         participant,
         name,
         desc,
         avatar,
         imageUrl,
         votes: 0
-      };
+      });
 
-      costumes.push(newCostume);
-      saveData();
-      renderCostumes();
-
-      // Reset form
       document.getElementById('add-costume-form').reset();
       selectAvatar(AVATARS[0], document.querySelectorAll('.avatar-btn')[0]);
-      
-      // Feedback
       confetti({ particleCount: 40, spread: 60, origin: { y: 0.8 } });
-      alert('🎉 Votre costume a été inscrit avec succès !');
+      alert('🎉 Costume inscrit en direct !');
     }
 
-    // --- RENDER COSTUMES GRID ---
     function renderCostumes() {
       const grid = document.getElementById('costumes-grid');
       const emptyState = document.getElementById('empty-state');
@@ -600,7 +552,7 @@
 
       grid.innerHTML = costumes.map(item => {
         const hasVotedThis = userVotedIds.includes(item.id);
-        const votesLeft = settings.maxVotesPerUser - userVotedIds.length;
+        const votesLeft = (settings.maxVotesPerUser || 3) - userVotedIds.length;
         const canVote = settings.votingOpen && (hasVotedThis || votesLeft > 0);
 
         return `
@@ -618,10 +570,9 @@
                     <p class="text-xs text-spooky-orange font-semibold">Par ${escapeHTML(item.participant)}</p>
                   </div>
                   <span class="bg-purple-950 border border-purple-800 text-purple-200 text-xs font-black px-2.5 py-1 rounded-lg shrink-0">
-                    👻 ${item.votes} pts
+                    👻 ${item.votes || 0} pts
                   </span>
                 </div>
-
                 ${item.desc ? `<p class="text-xs text-gray-400 line-clamp-2">${escapeHTML(item.desc)}</p>` : ''}
               </div>
             </div>
@@ -645,32 +596,26 @@
       }).join('');
     }
 
-    // --- VOTING MECHANISM ---
     function handleVote(costumeId) {
       if (!settings.votingOpen) {
-        alert("🔒 Les votes sont actuellement fermés !");
+        alert("🔒 Les votes sont fermés !");
         return;
       }
 
-      const costume = costumes.find(c => c.id === costumeId);
-      if (!costume) return;
-
       const existingIndex = userVotedIds.indexOf(costumeId);
+      const costumeRef = db.ref(`costumes/${costumeId}/votes`);
 
       if (existingIndex > -1) {
-        // Retract vote
         userVotedIds.splice(existingIndex, 1);
-        costume.votes = Math.max(0, costume.votes - 1);
+        costumeRef.transaction(current => Math.max(0, (current || 0) - 1));
       } else {
-        // Add vote
-        if (userVotedIds.length >= settings.maxVotesPerUser) {
-          alert(`⚠️ Vous avez déjà utilisé vos ${settings.maxVotesPerUser} votes disponibles !`);
+        if (userVotedIds.length >= (settings.maxVotesPerUser || 3)) {
+          alert(`⚠️ Vous avez utilisé vos ${settings.maxVotesPerUser} votes disponibles !`);
           return;
         }
         userVotedIds.push(costumeId);
-        costume.votes += 1;
+        costumeRef.transaction(current => (current || 0) + 1);
 
-        // Spooky Confetti Animation
         confetti({
           particleCount: 60,
           spread: 70,
@@ -679,21 +624,18 @@
         });
       }
 
-      saveData();
-      renderCostumes();
+      saveUserVotesToLocal();
       updateVoteCounterUI();
     }
 
     function updateVoteCounterUI() {
-      const votesLeft = Math.max(0, settings.maxVotesPerUser - userVotedIds.length);
-      document.getElementById('votes-left-text').innerText = `${votesLeft} / ${settings.maxVotesPerUser}`;
+      const votesLeft = Math.max(0, (settings.maxVotesPerUser || 3) - userVotedIds.length);
+      document.getElementById('votes-left-text').innerText = `${votesLeft} / ${settings.maxVotesPerUser || 3}`;
     }
 
-    // --- LEADERBOARD & PODIUM ---
     function renderLeaderboard() {
-      const sorted = [...costumes].sort((a, b) => b.votes - a.votes);
+      const sorted = [...costumes].sort((a, b) => (b.votes || 0) - (a.votes || 0));
 
-      // Top 3 Podium
       const top1 = sorted[0] || { name: '-', participant: '-', votes: 0, avatar: '🎃' };
       const top2 = sorted[1] || { name: '-', participant: '-', votes: 0, avatar: '👻' };
       const top3 = sorted[2] || { name: '-', participant: '-', votes: 0, avatar: '🦇' };
@@ -702,10 +644,9 @@
       updatePodiumSlot(2, top2);
       updatePodiumSlot(3, top3);
 
-      // Full List
       const listContainer = document.getElementById('full-leaderboard-list');
       if (sorted.length === 0) {
-        listContainer.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Aucun costume à classer pour le moment.</p>`;
+        listContainer.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Aucun costume pour le moment.</p>`;
         return;
       }
 
@@ -722,7 +663,7 @@
             </div>
           </div>
           <span class="font-extrabold bg-purple-950 px-2.5 py-1 rounded-lg text-purple-300 border border-purple-800/50 shrink-0">
-            ${item.votes} pts
+            ${item.votes || 0} pts
           </span>
         </div>
       `).join('');
@@ -732,10 +673,9 @@
       document.getElementById(`podium-${rank}-avatar`).innerText = item.avatar || '🎃';
       document.getElementById(`podium-${rank}-name`).innerText = item.name !== '-' ? item.name : '—';
       document.getElementById(`podium-${rank}-title`).innerText = item.participant !== '-' ? `Par ${item.participant}` : '';
-      document.getElementById(`podium-${rank}-votes`).innerText = `${item.votes} pts`;
+      document.getElementById(`podium-${rank}-votes`).innerText = `${item.votes || 0} pts`;
     }
 
-    // --- ADMIN MANAGEMENT & EDIT COSTUMES ---
     function renderAdminCostumeList() {
       const container = document.getElementById('admin-costumes-list');
       if (costumes.length === 0) {
@@ -749,7 +689,7 @@
             <span class="text-2xl">${item.avatar}</span>
             <div class="truncate">
               <p class="font-bold text-white truncate">${escapeHTML(item.name)}</p>
-              <p class="text-[11px] text-spooky-orange">Par ${escapeHTML(item.participant)} (${item.votes} pts)</p>
+              <p class="text-[11px] text-spooky-orange">Par ${escapeHTML(item.participant)} (${item.votes || 0} pts)</p>
             </div>
           </div>
           <div class="flex gap-2 shrink-0">
@@ -774,7 +714,7 @@
       document.getElementById('edit-desc').value = item.desc || '';
       document.getElementById('edit-avatar').value = item.avatar || '🎃';
       document.getElementById('edit-image-url').value = item.imageUrl || '';
-      document.getElementById('edit-votes').value = item.votes;
+      document.getElementById('edit-votes').value = item.votes || 0;
 
       document.getElementById('edit-modal').classList.remove('hidden');
     }
@@ -786,50 +726,37 @@
     function handleSaveEdit(e) {
       e.preventDefault();
       const id = document.getElementById('edit-costume-id').value;
-      const costume = costumes.find(c => c.id === id);
 
-      if (costume) {
-        costume.participant = document.getElementById('edit-participant').value.trim();
-        costume.name = document.getElementById('edit-name').value.trim();
-        costume.desc = document.getElementById('edit-desc').value.trim();
-        costume.avatar = document.getElementById('edit-avatar').value.trim();
-        costume.imageUrl = document.getElementById('edit-image-url').value.trim();
-        costume.votes = parseInt(document.getElementById('edit-votes').value) || 0;
+      db.ref(`costumes/${id}`).update({
+        participant: document.getElementById('edit-participant').value.trim(),
+        name: document.getElementById('edit-name').value.trim(),
+        desc: document.getElementById('edit-desc').value.trim(),
+        avatar: document.getElementById('edit-avatar').value.trim(),
+        imageUrl: document.getElementById('edit-image-url').value.trim(),
+        votes: parseInt(document.getElementById('edit-votes').value) || 0
+      });
 
-        saveData();
-        renderCostumes();
-        renderAdminCostumeList();
-        renderLeaderboard();
-        closeEditModal();
-        alert('✅ Costume mis à jour !');
-      }
+      closeEditModal();
     }
 
     function deleteSingleCostume(id) {
       if (confirm('Voulez-vous vraiment supprimer ce costume ?')) {
-        costumes = costumes.filter(c => c.id !== id);
-        saveData();
-        renderCostumes();
-        renderAdminCostumeList();
-        renderLeaderboard();
+        db.ref(`costumes/${id}`).remove();
       }
     }
 
-    // --- ADMIN AUTHENTICATION ---
     function handleAdminLogin(e) {
       e.preventDefault();
       const input = document.getElementById('admin-password-input').value;
-      const errorMsg = document.getElementById('admin-login-error');
-
       if (input === '1234') {
         isAdminAuthenticated = true;
         document.getElementById('admin-login-card').classList.add('hidden');
         document.getElementById('admin-dashboard-content').classList.remove('hidden');
-        errorMsg.classList.add('hidden');
+        document.getElementById('admin-login-error').classList.add('hidden');
         generateQRCodes();
         renderAdminCostumeList();
       } else {
-        errorMsg.classList.remove('hidden');
+        document.getElementById('admin-login-error').classList.remove('hidden');
       }
     }
 
@@ -840,104 +767,57 @@
       document.getElementById('admin-dashboard-content').classList.add('hidden');
     }
 
-    // --- ADMIN SETTINGS ACTIONS ---
     function saveMaxVotesSetting() {
       const val = parseInt(document.getElementById('setting-max-votes').value) || 3;
-      settings.maxVotesPerUser = val;
-      saveData();
-      renderCostumes();
-      updateVoteCounterUI();
-      alert(`✅ Nombre maximum de votes mis à jour (${val} par personne)`);
+      db.ref('settings/maxVotesPerUser').set(val);
+      alert(`✅ Nombre max de votes mis à jour : ${val}`);
     }
 
     function toggleVotingStatus() {
-      settings.votingOpen = !settings.votingOpen;
-      saveData();
-      updateAdminVotingBtnUI();
-      renderCostumes();
-
-      const banner = document.getElementById('voting-closed-banner');
-      if (settings.votingOpen) {
-        banner.classList.add('hidden');
-      } else {
-        banner.classList.remove('hidden');
-      }
+      db.ref('settings/votingOpen').set(!settings.votingOpen);
     }
 
     function updateAdminVotingBtnUI() {
       const btn = document.getElementById('toggle-voting-btn');
       if (settings.votingOpen) {
         btn.className = "w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center gap-2";
-        btn.innerHTML = `<i class="fa-solid fa-unlock"></i> Votes Ouverts (Cliquer pour fermer)`;
+        btn.innerHTML = `<i class="fa-solid fa-unlock"></i> Votes Ouverts`;
       } else {
         btn.className = "w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center gap-2";
-        btn.innerHTML = `<i class="fa-solid fa-lock"></i> Votes Fermés (Cliquer pour ouvrir)`;
+        btn.innerHTML = `<i class="fa-solid fa-lock"></i> Votes Fermés`;
       }
     }
 
     function resetAllVotes() {
-      if (confirm('⚠️ Voulez-vous vraiment réinitialiser le compteur de votes de TOUS les costumes à zéro ?')) {
-        costumes.forEach(c => c.votes = 0);
-        userVotedIds = [];
-        saveData();
-        renderCostumes();
-        renderAdminCostumeList();
-        renderLeaderboard();
-        updateVoteCounterUI();
-        alert('🔄 Tous les votes ont été remis à zéro.');
+      if (confirm('⚠️ Réinitialiser TOUS les votes à zéro ?')) {
+        costumes.forEach(c => db.ref(`costumes/${c.id}/votes`).set(0));
       }
     }
 
     function clearAllCostumes() {
-      if (confirm('🚨 ATTENTION : Voulez-vous vraiment supprimer définitivement TOUS les costumes inscrits ?')) {
-        costumes = [];
-        userVotedIds = [];
-        saveData();
-        renderCostumes();
-        renderAdminCostumeList();
-        renderLeaderboard();
-        updateVoteCounterUI();
-        alert('🗑️ La liste des costumes a été vidée.');
+      if (confirm('🚨 SUPPRIMER définitivement tous les costumes ?')) {
+        db.ref('costumes').remove();
       }
     }
 
-    // --- QR CODE GENERATION ---
     function setupQRDefaultURL() {
-      const currentURL = window.location.href;
-      document.getElementById('qr-url-input').value = currentURL;
+      document.getElementById('qr-url-input').value = window.location.href;
     }
 
     function generateQRCodes() {
       const url = document.getElementById('qr-url-input').value || window.location.href;
       
-      // Inline Admin QR
       const container = document.getElementById('qrcode-container');
       container.innerHTML = '';
-      new QRCode(container, {
-        text: url,
-        width: 140,
-        height: 140,
-        colorDark: "#0d0d0d",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
+      new QRCode(container, { text: url, width: 140, height: 140 });
 
-      // Fullscreen Modal QR
       const modalContainer = document.getElementById('modal-qrcode-container');
       modalContainer.innerHTML = '';
-      new QRCode(modalContainer, {
-        text: url,
-        width: 260,
-        height: 260,
-        colorDark: "#0d0d0d",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
+      new QRCode(modalContainer, { text: url, width: 260, height: 260 });
     }
 
     function updateQRCode() {
       generateQRCodes();
-      alert('✨ Code QR mis à jour avec la nouvelle URL !');
     }
 
     function openFullscreenQR() {
@@ -949,17 +829,10 @@
       document.getElementById('qr-modal').classList.add('hidden');
     }
 
-    // --- UTILS ---
     function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, 
-        tag => ({
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          "'": '&#39;',
-          '"': '&quot;'
-        }[tag] || tag)
-      );
+      return (str || '').replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[tag] || tag));
     }
   </script>
 </body>
