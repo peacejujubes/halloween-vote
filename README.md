@@ -1,50 +1,57 @@
 # 🎃 Halloween Costume Vote App
 
-Une application web interactive, légère et clé en main pour organiser un concours du meilleur costume d'Halloween lors de vos soirées. Elle permet aux invités d'inscrire leur costume, de voter facilement depuis leur téléphone via un **Code QR**, et d'afficher le classement en temps réel.
+Une application web interactive, responsive et en temps réel pour organiser un concours du meilleur costume d'Halloween lors de vos soirées. 
+
+Grâce à l'intégration de **Firebase Realtime Database**, tous les costumes inscrits et les votes effectués depuis les smartphones des invités sont synchronisés instantanément sur tous les écrans (téléphones, ordinateurs et écrans de projection).
 
 ---
 
 ## ✨ Fonctionnalités principales
 
-- 🎭 **Inscription ouverte à tous** : Les participants ajoutent leur propre costume (nom, participant, description, avatar ou image) directement depuis la page d'accueil.
-- 📱 **Vote mobile facile** : Interface optimisée pour smartphone avec limitation anti-triche du nombre de votes par personne (via `localStorage`).
-- 🏆 **Podium et Classement en direct** : Visualisation du Top 3 (Podium) et du tableau complet mis à jour instantanément.
+- 🎭 **Inscription ouverte à tous** : Les participants ajoutent leur propre costume (nom, participant, description, avatar emoji ou photo) directement depuis la page d'accueil.
+- ⚡ **Synchronisation Temps Réel (Firebase)** : Aucun rafraîchissement requis. Lorsqu'un costume est ajouté ou qu'un vote est émis, la liste et le classement se mettent à jour en direct.
+- 📱 **Vote mobile & anti-triche** : Interface optimisée pour smartphone avec limitation du nombre de votes autorisés par personne (sauvegardé en `localStorage`).
+- 🏆 **Podium et Classement interactif** : Visualisation stylisée du Top 3 (Podium) et du tableau complet des résultats.
 - 🔐 **Portail Administrateur protégé (MDP : `1234`)** :
-  - **Gestion des costumes** : Modification et suppression des participations.
-  - **Générateur de Code QR** : Génération automatique et mode projection plein écran pour téléviseurs ou moniteurs.
-  - **Contrôle du scrutin** : Verrouillage/déverrouillage des votes et ajustement de la limite de votes max par personne.
-  - **Réinitialisation** : Remise à zéro des scores ou nettoyage de la liste.
-- 🎉 **Effets d'Halloween** : Confettis thématiques (orange, violet, vert) et design sombre (*Spooky Theme*).
-
----
-
-## 🚀 Déploiement rapide sur GitHub Pages
-
-1. **Activez GitHub Pages** :
-   - Allez dans votre dépôt GitHub : `Settings` > `Pages`.
-   - Sous **Build and deployment**, choisissez la branche `main` (ou `master`) et conservez `/ (root)`.
-   - Cliquez sur **Save**.
-
-2. **Accédez au site** :
-   - Votre application sera accessible en quelques secondes à l'adresse :  
-     `https://<votre-pseudo>.github.io/halloween-vote/`
+  - **Gestion des participations** : Modification et suppression des costumes en direct.
+  - **Générateur de Code QR** : Génération dynamique et mode projection plein écran pour téléviseurs ou projecteurs.
+  - **Contrôle du scrutin** : Verrouillage/déverrouillage des votes à distance et ajustement de la limite de votes par personne.
+  - **Réinitialisation** : Remise à zéro des scores ou suppression globale de la liste.
+- 🎉 **Animations d'Halloween** : Pluie de confettis thématiques (orange, violet, vert, jaune) lors du vote.
 
 ---
 
 ## 🛠️ Stack technique
 
-- **HTML5 & Vanilla JavaScript** (aucun framework complexe requis).
-- **Tailwind CSS** (via CDN pour un style responsive et rapide).
-- **FontAwesome** (icônes).
-- **QRCode.js** (génération dynamique de codes QR).
-- **Canvas Confetti** (animation de célébration lors du vote).
+- **Frontend** : HTML5, Vanilla JavaScript, Tailwind CSS (CDN).
+- **Backend / Database** : Firebase Realtime Database (SDK v9 Compat).
+- **Librairies** : 
+  - `QRCode.js` pour la génération des codes QR.
+  - `canvas-confetti` pour les animations de célébration.
+  - `FontAwesome 6` pour l'iconographie.
 
 ---
 
-## 🔒 Configuration du MDP Admin
+## 🚀 Déploiement sur GitHub Pages
 
-Le mot de passe par défaut du panneau d'administration est **`1234`**.  
-Pour le modifier, éditez directement la ligne suivante dans le fichier `index.html` :
+1. **Activez GitHub Pages** :
+   - Rendez-vous sur votre dépôt GitHub : `Settings` > `Pages`.
+   - Sous **Build and deployment**, choisissez la branche `main` (ou `master`) et conservez `/ (root)`.
+   - Cliquez sur **Save**.
 
-```javascript
-if (input === '1234') { ... }
+2. **Accédez au site** :
+   - Votre application sera en ligne en quelques secondes à l'adresse :  
+     `https://<votre-pseudo>.github.io/halloween-vote/`
+
+---
+
+## 🔐 Remarque sur la sécurité & Firebase
+
+Les identifiants `firebaseConfig` présents dans `index.html` servent uniquement d'identifiants de projet et sont publiquement accessibles par nature dans les applications web front-end. La sécurité de la base de données est assurée directement par les **Règles de sécurité Firebase Realtime Database** définies dans la console Google Firebase.
+
+> **Mot de passe Admin par défaut** : `1234`  
+> *(Modifiable directement dans la fonction `handleAdminLogin` du fichier `index.html`)*
+
+---
+
+🎃 *Joyeux Halloween et que le meilleur costume gagne !*
