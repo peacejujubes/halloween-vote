@@ -8,10 +8,12 @@ Grâce à l'intégration de **Firebase Realtime Database**, tous les costumes in
 
 ## ✨ Fonctionnalités principales
 
-- 🎭 **Inscription ouverte à tous** : Les participants ajoutent leur propre costume (nom, participant, description, avatar emoji ou photo) directement depuis la page d'accueil.
-- ⚡ **Synchronisation Temps Réel (Firebase)** : Aucun rafraîchissement requis. Lorsqu'un costume est ajouté ou qu'un vote est émis, la liste et le classement se mettent à jour en direct.
+- 📸 **Prise de photo en direct** : Inscription fluide sur mobile avec possibilité de **prendre une photo de son costume en direct via l'appareil photo**, de choisir une photo dans la galerie ou de sélectionner un emoji avatar.
+- 🗜️ **Optimization d'image intégrée** : Compression et redimensionnement automatiques des photos côté client (format léger JPEG Base64) pour une synchronisation ultra-rapide sans serveur externe.
+- 🎭 **Inscription ouverte à tous** : Les participants inscrivent leur costume (nom, participant, description, photo/emoji) directement depuis la page d'accueil.
+- ⚡ **Synchronisation Temps Réel (Firebase)** : Aucun rafraîchissement requis. Lorsqu'un costume est ajouté ou qu'un vote est émis, la liste, le podium et le classement se mettent à jour en direct.
 - 📱 **Vote mobile & anti-triche** : Interface optimisée pour smartphone avec limitation du nombre de votes autorisés par personne (sauvegardé en `localStorage`).
-- 🏆 **Podium et Classement interactif** : Visualisation stylisée du Top 3 (Podium) et du tableau complet des résultats.
+- 🏆 **Podium & Classement interactif** : Visualisation du Top 3 (Podium avec photos) et du tableau complet des résultats.
 - 🔐 **Portail Administrateur protégé (MDP : `1234`)** :
   - **Gestion des participations** : Modification et suppression des costumes en direct.
   - **Générateur de Code QR** : Génération dynamique et mode projection plein écran pour téléviseurs ou projecteurs.
