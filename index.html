@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concours du Meilleur Costume d'Halloween 🎃</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        spooky: {
+                            orange: '#ff6600',
+                            purple: '#8b00ff',
+                            green: '#00ff66',
+                            dark: '#0f0a1c',
+                            card: '#1a122e',
+                            accent: '#ff0055'
+                        }
+                    },
+                    fontFamily: {
+                        creep: ['Creepster', 'cursive', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Fonts Google: Creepster & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            background-color: #0b0714;
+            color: #f3f4f6;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(139, 0, 255, 0.15) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 102, 0, 0.15) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(0, 255, 102, 0.05) 0%, transparent 50%);
+            min-height: 100vh;
+        }
+
+        .font-creepster {
+            font-family: 'Creepster', cursive;
+        }
+
+        /* Effets de lueur Halloween */
+        .glow-orange {
+            box-shadow: 0 0 15px rgba(255, 102, 0, 0.4);
+        }
+        .glow-purple {
+            box-shadow: 0 0 15px rgba(139, 0, 255, 0.4);
+        }
+        .text-glow-orange {
+            text-shadow: 0 0 10px rgba(255, 102, 0, 0.7);
+        }
+        .text-glow-green {
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.7);
+        }
+
+        /* Animations flottantes pour les éléments effrayants */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.3; }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 3s ease-in-out infinite;
+        }
+
+        /* Masquage de la barre de défilement */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="font-sans flex flex-col justify-between min-h-screen relative overflow-x-hidden">
+
+    <!-- Éléments décoratifs en arrière-plan -->
+    <div class="fixed top-10 left-5 text-4xl opacity-20 pointer-events-none animate-float">🦇</div>
+    <div class="fixed top-20 right-10 text-5xl opacity-20 pointer-events-none animate-float" style="animation-delay: 1s;">👻</div>
+    <div class="fixed bottom-10 left-12 text-5xl opacity-20 pointer-events-none animate-float" style="animation-delay: 2s;">🎃</div>
+    <div class="fixed bottom-20 right-8 text-4xl opacity-20 pointer-events-none animate-float" style="animation-delay: 1.5s;">🕷️</div>
+
+    <!-- En-tête / Navigation -->
+    <header class="bg-spooky-card/80 backdrop-blur-md border-b border-purple-900/50 sticky top-0 z-40 px-4 py-3 shadow-lg">
+        <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('vote')">
+                <span class="text-3xl animate-bounce">🎃</span>
+                <h1 class="text-2xl sm:text-3xl font-creepster tracking-wider text-spooky-orange text-glow-orange">
+                    Costume Royale
+                </h1>
+            </div>
+
+            <!-- Boutons de navigation principaux -->
+            <nav class="flex items-center space-x-2 bg-spooky-dark/60 p-1 rounded-xl border border-purple-800/40">
+                <button id="nav-vote" onclick="switchTab('vote')" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 bg-spooky-orange text-white shadow-md">
+                    <i class="fa-solid fa-vote-yea"></i>
+                    <span>Voter</span>
+                </button>
+                <button id="nav-leaderboard" onclick="switchTab('leaderboard')" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-purple-900/40">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span>Résultats</span>
+                </button>
+                <button id="nav-admin" onclick="switchTab('admin')" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-purple-900/40">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <span>Admin</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenu Principal -->
+    <main class="max-w-6xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- Banner Statut / Info -->
+        <div id="status-banner" class="hidden mb-6 p-3 rounded-xl bg-purple-950/60 border border-purple-500/30 text-center text-sm font-medium text-purple-200 shadow-md">
+            <!-- Message dynamique inséré via JS -->
+        </div>
+
+        <!-- SECTION 1: VOTING PAGE -->
+        <section id="sec-vote" class="space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl sm:text-4xl font-creepster text-purple-400">Élection du Meilleur Costume</h2>
+                <p class="text-gray-400 text-sm sm:text-base max-w-lg mx-auto">
+                    Découvrez les costumes effrayants et choisissez vos préférés ! Vous disposez de <span id="user-remaining-votes" class="text-spooky-orange font-bold">1</span> vote(s).
+                </p>
+            </div>
+
+            <!-- Liste des candidats (Grille) -->
+            <div id="contestants-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Rempli dynamiquement via JS -->
+            </div>
+
+            <!-- Message si aucun candidat -->
+            <div id="empty-contestants" class="hidden text-center py-12 bg-spooky-card/40 rounded-2xl border border-dashed border-purple-800/40">
+                <div class="text-6xl mb-3">👻</div>
+                <h3 class="text-xl font-bold text-gray-300">Aucun costume pour le moment !</h3>
+                <p class="text-gray-400 text-sm mt-1">Allez dans la section Admin pour ajouter les premiers participants.</p>
+                <button onclick="switchTab('admin')" class="mt-4 px-4 py-2 bg-purple-700 hover:bg-purple-600 text-white rounded-lg text-sm font-semibold transition">
+                    Ajouter des participants
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: LIVE LEADERBOARD -->
+        <section id="sec-leaderboard" class="hidden space-y-6">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl sm:text-4xl font-creepster text-spooky-green text-glow-green">Classement en Direct</h2>
+                <p class="text-gray-400 text-sm">Les scores sont mis à jour instantanément à chaque vote !</p>
+            </div>
+
+            <!-- Podium des 3 Premiers -->
+            <div id="podium-container" class="grid grid-cols-3 gap-2 sm:gap-4 items-end pt-8 pb-4 max-w-2xl mx-auto">
+                <!-- podium 2nd -->
+                <div id="podium-2" class="flex flex-col items-center">
+                    <!-- Dynamic insert -->
+                </div>
+                <!-- podium 1st -->
+                <div id="podium-1" class="flex flex-col items-center">
+                    <!-- Dynamic insert -->
+                </div>
+                <!-- podium 3rd -->
+                <div id="podium-3" class="flex flex-col items-center">
+                    <!-- Dynamic insert -->
+                </div>
+            </div>
+
+            <!-- Liste complète du classement -->
+            <div class="bg-spooky-card/80 border border-purple-800/40 rounded-2xl p-4 sm:p-6 shadow-xl backdrop-blur-sm">
+                <h3 class="text-lg font-bold text-purple-300 mb-4 flex items-center space-x-2">
+                    <i class="fa-solid fa-list-ol text-spooky-orange"></i>
+                    <span>Tableau d'Honneur</span>
+                </h3>
+                <div id="leaderboard-list" class="space-y-3">
+                    <!-- Dynamic leaderboard list -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: ADMIN & CONFIGURATION -->
+        <section id="sec-admin" class="hidden space-y-8">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl sm:text-4xl font-creepster text-spooky-orange">Panneau d'Administration</h2>
+                <p class="text-gray-400 text-sm">Gérez le concours, ajoutez des participants et partagez le code QR pour voter.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                <!-- Formulaire d'ajout de participant -->
+                <div class="lg:col-span-2 bg-spooky-card/90 border border-purple-800/50 rounded-2xl p-6 shadow-xl space-y-4">
+                    <h3 class="text-xl font-bold text-purple-200 border-b border-purple-800/50 pb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-user-plus text-spooky-orange"></i>
+                        <span>Inscrire un Costume</span>
+                    </h3>
+
+                    <form id="add-contestant-form" onsubmit="handleAddContestant(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Nom du participant *</label>
+                                <input type="text" id="input-name" required placeholder="ex: Marie, Lucas..." 
+                                       class="w-full bg-spooky-dark/80 border border-purple-700/50 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-spooky-orange transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Titre du costume *</label>
+                                <input type="text" id="input-costume" required placeholder="ex: Vampire Ancien, Cyber Zombie..." 
+                                       class="w-full bg-spooky-dark/80 border border-purple-700/50 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-spooky-orange transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Description (Optionnel)</label>
+                            <input type="text" id="input-desc" placeholder="ex: Costume fait main avec effets lumineux" 
+                                   class="w-full bg-spooky-dark/80 border border-purple-700/50 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-spooky-orange transition">
+                        </div>
+
+                        <!-- Choix Avatar / Photo -->
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-2">Illustration / Avatar ou Image</label>
+                            
+                            <!-- Tabs de choix d'image -->
+                            <div class="flex space-x-2 mb-3">
+                                <button type="button" onclick="setAvatarMode('emoji')" id="btn-mode-emoji" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-800 text-white border border-purple-600">
+                                    Icône Spooky 🎃
+                                </button>
+                                <button type="button" onclick="setAvatarMode('url')" id="btn-mode-url" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-spooky-dark text-gray-400 border border-purple-900">
+                                    Lien Image (URL) 🔗
+                                </button>
+                            </div>
+
+                            <!-- Sélection Emoji -->
+                            <div id="avatar-emoji-picker" class="flex flex-wrap gap-2 p-3 bg-spooky-dark/60 rounded-xl border border-purple-900/50">
+                                <span onclick="selectEmoji('🧙‍♀️')" class="emoji-opt text-2xl p-2 cursor-pointer hover:bg-purple-800/50 rounded-lg transition border border-transparent">🧙‍♀️</span>
+                                <span onclick="selectEmoji('vampire')" class="emoji-opt text-2xl p-2 cursor-pointer hover:bg-purple-800/50 rounded-lg transition border border-transparent">🧛‍♂️</span>
+                                <span onclick="selectEmoji('zombie')" class="emoji-opt text-2xl p-2 cursor-pointer hover:bg-purple-800/50 rounded-lg transition border border-transparent">🧟‍♂️</span>
+                                <span onclick="selectEmoji('ghost')" class="emoji-opt text-2xl p-2 cursor-pointer hover:bg-purple-800/50 rounded-lg transition border border-transparent">👻</span>
+                                <span onclick="selectEmoji('skeleton')" class="emoji-opt text-2xl p-2 cursor-pointer hover:bg-purple-800/50 rounded-lg transition border border-transparent">💀</span>
+                                <span onclick="selectEmoji('pumpkin')" class="emoji-opt text-2xl p-2 cursor-pointer hover:bg-purple-800/50 rounded-lg transition border border-transparent">🎃</span>
+                                <span onclick="selectEmoji('demon')" class="emoji-opt text-2xl p-2 cursor-pointer hover:bg-purple-800/50 rounded-lg transition border border-transparent">😈</span>
+                                <span onclick="selectEmoji('alien')" class="emoji-opt text-2xl p-2 cursor-pointer hover:bg-purple-800/50 rounded-lg transition border border-transparent">👽</span>
+                                <span onclick="selectEmoji('clown')" class="emoji-opt text-2xl p-2 cursor-pointer hover:bg-purple-800/50 rounded-lg transition border border-transparent">🤡</span>
+                                <span onclick="selectEmoji('cat')" class="emoji-opt text-2xl p-2 cursor-pointer hover:bg-purple-800/50 rounded-lg transition border border-transparent">🐈‍⬛</span>
+                            </div>
+
+                            <!-- Champ URL -->
+                            <div id="avatar-url-input" class="hidden mt-2">
+                                <input type="url" id="input-image-url" placeholder="https://exemple.com/mon-costume.jpg" 
+                                       class="w-full bg-spooky-dark/80 border border-purple-700/50 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-spooky-orange transition">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 bg-gradient-to-r from-spooky-orange to-red-600 hover:from-orange-500 hover:to-red-500 text-white font-bold rounded-xl shadow-lg transition duration-200 transform hover:-translate-y-0.5">
+                            ➕ Inscrire le costume
+                        </button>
+                    </form>
+                </div>
+
+                <!-- QR Code & Contröles Concours -->
+                <div class="space-y-6">
+                    <!-- Section QR Code -->
+                    <div class="bg-spooky-card/90 border border-purple-800/50 rounded-2xl p-6 shadow-xl text-center space-y-4">
+                        <h3 class="text-lg font-bold text-purple-200 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-qrcode text-spooky-green"></i>
+                            <span>Code QR de Vote</span>
+                        </h3>
+                        <p class="text-xs text-gray-400">Scannez avec un téléphone pour ouvrir la page de vote</p>
+                        
+                        <!-- Canvas / Container pour QR -->
+                        <div class="flex justify-center p-3 bg-white rounded-xl shadow-inner inline-block mx-auto border-4 border-purple-600">
+                            <div id="qrcode"></div>
+                        </div>
+
+                        <div class="pt-2 flex flex-col space-y-2">
+                            <button onclick="copyVoteUrl()" class="w-full py-2 bg-purple-900/60 hover:bg-purple-800/80 text-purple-200 border border-purple-600/50 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-copy"></i>
+                                <span>Copier le lien de vote</span>
+                            </button>
+                            <button onclick="toggleFullScreenQR()" class="w-full py-2 bg-spooky-green/20 hover:bg-spooky-green/30 text-spooky-green border border-spooky-green/40 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-expand"></i>
+                                <span>Agrandir pour l'écran / Projeter</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Contrôles Admin -->
+                    <div class="bg-spooky-card/90 border border-purple-800/50 rounded-2xl p-6 shadow-xl space-y-4">
+                        <h3 class="text-lg font-bold text-purple-200 border-b border-purple-800/50 pb-2 flex items-center space-x-2">
+                            <i class="fa-solid fa-sliders text-spooky-orange"></i>
+                            <span>Paramètres du Concours</span>
+                        </h3>
+
+                        <!-- Nombre max de votes par personne -->
+                        <div class="space-y-1">
+                            <label class="block text-xs font-semibold text-gray-300">Votes maximum par votant :</label>
+                            <select id="select-max-votes" onchange="updateMaxVotes(this.value)" class="w-full bg-spooky-dark border border-purple-700/50 rounded-xl px-3 py-2 text-sm text-white">
+                                <option value="1">1 vote par personne</option>
+                                <option value="2">2 votes par personne</option>
+                                <option value="3">3 votes par personne</option>
+                            </select>
+                        </div>
+
+                        <!-- Verrouiller/Déverrouiller les votes -->
+                        <div class="pt-2">
+                            <button id="btn-toggle-lock" onclick="toggleVotingLock()" class="w-full py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center space-x-2 border">
+                                <!-- Dynamic status button -->
+                            </button>
+                        </div>
+
+                        <!-- Actions Dangereuses -->
+                        <div class="border-t border-purple-900/60 pt-4 space-y-2">
+                            <button onclick="confirmResetVotes()" class="w-full py-2 bg-yellow-900/30 hover:bg-yellow-800/50 text-yellow-300 border border-yellow-700/50 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span>Réinitialiser les votes (remettre à 0)</span>
+                            </button>
+
+                            <button onclick="confirmClearAll()" class="w-full py-2 bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-800/50 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-trash-can"></i>
+                                <span>Effacer TOUT (Costumes + Votes)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Liste des participants inscrits (Pour modification / suppression) -->
+            <div class="bg-spooky-card/90 border border-purple-800/50 rounded-2xl p-6 shadow-xl space-y-4">
+                <h3 class="text-lg font-bold text-purple-200 border-b border-purple-800/50 pb-3 flex items-center justify-between">
+                    <span>Gestion des candidats inscrits (<span id="admin-contestant-count">0</span>)</span>
+                </h3>
+                <div id="admin-contestant-list" class="divide-y divide-purple-900/40">
+                    <!-- Inséré dynamiquement -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal QR grand écran pour projection -->
+    <div id="qr-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col items-center justify-center p-4 backdrop-blur-md">
+        <button onclick="toggleFullScreenQR()" class="absolute top-6 right-6 text-gray-400 hover:text-white text-3xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="text-center space-y-4 max-w-md">
+            <h2 class="text-4xl font-creepster text-spooky-orange">Scannez pour Voter ! 🎃</h2>
+            <p class="text-gray-300 text-sm">Pointez l'appareil photo de votre smartphone vers le code QR</p>
+            <div class="p-6 bg-white rounded-3xl shadow-2xl inline-block border-8 border-spooky-orange">
+                <div id="qrcode-modal-target"></div>
+            </div>
+            <p class="text-xs text-purple-300 animate-pulse">Élection du meilleur costume d'Halloween</p>
+        </div>
+    </div>
+
+    <!-- Toast / Pop-up de notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-spooky-card border border-spooky-orange text-white px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 pointer-events-none">
+        <span id="toast-icon" class="text-2xl">🎃</span>
+        <span id="toast-message" class="text-sm font-semibold">Message notification</span>
+    </div>
+
+    <!-- Pied de page -->
+    <footer class="text-center py-6 text-xs text-purple-400/60 border-t border-purple-950/80 mt-12">
+        <p>Joyeux Halloween ! 🦇 Concours interactif en direct</p>
+    </footer>
+
+    <!-- Logic JavaScript -->
+    <script>
+        // --- ÉTAT ET DONNÉES PAR DÉFAUT ---
+        const DEFAULT_CONTESTANTS = [
+            { id: 'c1', name: 'Alex', costume: 'Comte Dracula', desc: 'Cape noire et dents affûtées', avatar: '🧛‍♂️', avatarType: 'emoji', votes: 4 },
+            { id: 'c2', name: 'Sophie', costume: 'Sorcière Mystique', desc: 'Chapeau pointu et chaudron magique', avatar: '🧙‍♀️', avatarType: 'emoji', votes: 7 },
+            { id: 'c3', name: 'Thomas', costume: 'Zombie Pirate', desc: 'Revenant des sept mers', avatar: '🧟‍♂️', avatarType: 'emoji', votes: 2 }
+        ];
+
+        let state = {
+            contestants: [],
+            isLocked: false,
+            maxVotesPerUser: 1,
+            selectedEmoji: '🧙‍♀️',
+            avatarMode: 'emoji' // 'emoji' ou 'url'
+        };
+
+        let qrCodeObj = null;
+        let qrModalObj = null;
+
+        // --- INITIALISATION ---
+        window.onload = function() {
+            loadStateFromStorage();
+            initQRCode();
+            renderAll();
+            checkUrlMode();
+        };
+
+        // Charger l'état depuis LocalStorage
+        function loadStateFromStorage() {
+            const savedContestants = localStorage.getItem('spooky_contestants');
+            if (savedContestants) {
+                try {
+                    state.contestants = JSON.parse(savedContestants);
+                } catch(e) {
+                    state.contestants = [...DEFAULT_CONTESTANTS];
+                }
+            } else {
+                state.contestants = [...DEFAULT_CONTESTANTS];
+                saveContestants();
+            }
+
+            const savedLocked = localStorage.getItem('spooky_locked');
+            if (savedLocked !== null) {
+                state.isLocked = savedLocked === 'true';
+            }
+
+            const savedMaxVotes = localStorage.getItem('spooky_max_votes');
+            if (savedMaxVotes) {
+                state.maxVotesPerUser = parseInt(savedMaxVotes, 10) || 1;
+            }
+            document.getElementById('select-max-votes').value = state.maxVotesPerUser;
+        }
+
+        function saveContestants() {
+            localStorage.setItem('spooky_contestants', JSON.stringify(state.contestants));
+        }
+
+        // --- GESTION DU VOTE DE L'UTILISATEUR (LocalStorage Local) ---
+        function getUserVotes() {
+            try {
+                return JSON.parse(localStorage.getItem('spooky_user_votes') || '[]');
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function setUserVotes(votesArray) {
+            localStorage.setItem('spooky_user_votes', JSON.stringify(votesArray));
+        }
+
+        // --- SWITCH DE ONGLETS / NAVIGATION ---
+        function switchTab(tab) {
+            document.getElementById('sec-vote').classList.add('hidden');
+            document.getElementById('sec-leaderboard').classList.add('hidden');
+            document.getElementById('sec-admin').classList.add('hidden');
+
+            // Réinitialiser les classes actives des boutons
+            ['vote', 'leaderboard', 'admin'].forEach(t => {
+                const btn = document.getElementById(`nav-${t}`);
+                btn.className = "px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 text-gray-300 hover:text-white hover:bg-purple-900/40";
+            });
+
+            // Activer l'onglet choisi
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`nav-${tab}`);
+            activeBtn.className = "px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-2 bg-spooky-orange text-white shadow-md";
+
+            // Rendu spécifique si nécessaire
+            if (tab === 'leaderboard') {
+                renderLeaderboard();
+            } else if (tab === 'vote') {
+                renderVotingGrid();
+            } else if (tab === 'admin') {
+                renderAdminView();
+            }
+        }
+
+        // Détecter si on accède avec un paramètre ?voter=true
+        function checkUrlMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('mode') === 'voter') {
+                switchTab('vote');
+            }
+        }
+
+        // --- RENDU GLOBAL DE L'APPLICATION ---
+        function renderAll() {
+            renderVotingGrid();
+            renderLeaderboard();
+            renderAdminView();
+            updateBannerStatus();
+        }
+
+        // Rendu Banner Statut
+        function updateBannerStatus() {
+            const banner = document.getElementById('status-banner');
+            if (state.isLocked) {
+                banner.classList.remove('hidden');
+                banner.innerHTML = `<i class="fa-solid fa-lock text-yellow-400 mr-2"></i> Les votes sont actuellement <strong>verrouillés</strong> par l'administrateur.`;
+            } else {
+                banner.classList.add('hidden');
+            }
+        }
+
+        // --- SECTION 1: VOTING GRID ---
+        function renderVotingGrid() {
+            const grid = document.getElementById('contestants-grid');
+            const emptyMsg = document.getElementById('empty-contestants');
+            const remainingSpan = document.getElementById('user-remaining-votes');
+
+            const userVotes = getUserVotes();
+            const remainingVotes = state.maxVotesPerUser - userVotes.length;
+            remainingSpan.textContent = Math.max(0, remainingVotes);
+
+            grid.innerHTML = '';
+
+            if (state.contestants.length === 0) {
+                emptyMsg.classList.remove('hidden');
+                grid.classList.add('hidden');
+                return;
+            } else {
+                emptyMsg.classList.add('hidden');
+                grid.classList.remove('hidden');
+            }
+
+            state.contestants.forEach(c => {
+                const hasVotedForThis = userVotes.includes(c.id);
+                const canVote = !state.isLocked && remainingVotes > 0 && !hasVotedForThis;
+
+                const card = document.createElement('div');
+                card.className = "bg-spooky-card/90 border border-purple-800/40 rounded-2xl p-5 shadow-xl flex flex-col justify-between transition-all hover:border-purple-600/70 hover:shadow-2xl relative overflow-hidden group";
+
+                let avatarHtml = '';
+                if (c.avatarType === 'url' && c.avatar) {
+                    avatarHtml = `<img src="${c.avatar}" alt="${c.costume}" class="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-2xl border-2 border-purple-500/50 shadow-md">`;
+                } else {
+                    avatarHtml = `<div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-purple-950/80 border-2 border-purple-500/40 flex items-center justify-center text-5xl sm:text-6xl shadow-inner">${c.avatar || '🎃'}</div>`;
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="flex-shrink-0">
+                            ${avatarHtml}
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <h3 class="text-xl font-bold text-white truncate group-hover:text-spooky-orange transition-colors">${escapeHtml(c.costume)}</h3>
+                            <p class="text-xs text-purple-300 font-semibold mb-1">Par: ${escapeHtml(c.name)}</p>
+                            ${c.desc ? `<p class="text-xs text-gray-400 line-clamp-2">${escapeHtml(c.desc)}</p>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-purple-900/40 flex items-center justify-between mt-auto">
+                        <div class="text-xs text-gray-400">
+                            Votes: <span class="text-spooky-green font-bold text-base ml-1">${c.votes}</span>
+                        </div>
+                        <button onclick="castVote('${c.id}')" ${!canVote ? 'disabled' : ''} 
+                            class="${getVoteButtonClass(hasVotedForThis, canVote)}">
+                            ${hasVotedForThis ? '<i class="fa-solid fa-check mr-1"></i> Voté !' : '<i class="fa-solid fa-ghost mr-1"></i> Voter'}
+                        </button>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        function getVoteButtonClass(hasVoted, canVote) {
+            if (hasVoted) {
+                return "px-4 py-2 bg-green-900/40 border border-green-500/50 text-green-300 rounded-xl text-xs font-bold cursor-default";
+            }
+            if (!canVote) {
+                return "px-4 py-2 bg-gray-800 text-gray-500 border border-gray-700 rounded-xl text-xs font-bold cursor-not-allowed opacity-60";
+            }
+            return "px-4 py-2 bg-gradient-to-r from-spooky-orange to-purple-600 hover:from-orange-500 hover:to-purple-500 text-white rounded-xl text-xs font-bold shadow-lg transition duration-200 transform hover:scale-105 active:scale-95";
+        }
+
+        // Effectuer un vote
+        function castVote(contestantId) {
+            if (state.isLocked) {
+                showToast("Les votes sont fermés !", "🔒");
+                return;
+            }
+
+            const userVotes = getUserVotes();
+            if (userVotes.length >= state.maxVotesPerUser) {
+                showToast(`Vous avez déjà utilisé vos ${state.maxVotesPerUser} vote(s) !`, "⚠️");
+                return;
+            }
+
+            if (userVotes.includes(contestantId)) {
+                showToast("Vous avez déjà voté pour ce costume !", "👻");
+                return;
+            }
+
+            // Mettre à jour le candidat
+            const contestant = state.contestants.find(c => c.id === contestantId);
+            if (contestant) {
+                contestant.votes += 1;
+                userVotes.push(contestantId);
+                
+                saveContestants();
+                setUserVotes(userVotes);
+
+                // Animation Confetti
+                triggerConfetti();
+
+                showToast(`Votre vote pour "${contestant.costume}" est enregistré !`, "🎉");
+
+                // Mettre à jour l'affichage
+                renderVotingGrid();
+                renderLeaderboard();
+            }
+        }
+
+        // --- SECTION 2: LEADERBOARD ---
+        function renderLeaderboard() {
+            const sorted = [...state.contestants].sort((a, b) => b.votes - a.votes);
+            
+            // Podium (Top 3)
+            const p1Container = document.getElementById('podium-1');
+            const p2Container = document.getElementById('podium-2');
+            const p3Container = document.getElementById('podium-3');
+
+            p1Container.innerHTML = '';
+            p2Container.innerHTML = '';
+            p3Container.innerHTML = '';
+
+            if (sorted[0]) p1Container.appendChild(createPodiumCard(sorted[0], 1));
+            if (sorted[1]) p2Container.appendChild(createPodiumCard(sorted[1], 2));
+            if (sorted[2]) p3Container.appendChild(createPodiumCard(sorted[2], 3));
+
+            // Liste de tout le monde
+            const listContainer = document.getElementById('leaderboard-list');
+            listContainer.innerHTML = '';
+
+            if (sorted.length === 0) {
+                listContainer.innerHTML = `<p class="text-gray-400 text-center py-4 text-sm">Aucun participant pour le moment.</p>`;
+                return;
+            }
+
+            sorted.forEach((c, index) => {
+                const rank = index + 1;
+                let badgeClass = "bg-purple-950/60 text-purple-300 border-purple-800";
+                let badgeText = `#${rank}`;
+
+                if (rank === 1) { badgeClass = "bg-yellow-500/20 text-yellow-300 border-yellow-500/50"; badgeText = "🥇 1er"; }
+                else if (rank === 2) { badgeClass = "bg-slate-400/20 text-slate-200 border-slate-400/50"; badgeText = "🥈 2e"; }
+                else if (rank === 3) { badgeClass = "bg-amber-700/20 text-amber-400 border-amber-600/50"; badgeText = "🥉 3e"; }
+
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between p-3 rounded-xl bg-spooky-dark/60 border border-purple-900/30 hover:border-purple-700/50 transition";
+                
+                row.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${badgeClass}">${badgeText}</span>
+                        <div class="text-2xl">${c.avatarType === 'emoji' ? c.avatar : '🖼️'}</div>
+                        <div>
+                            <p class="text-sm font-bold text-white">${escapeHtml(c.costume)}</p>
+                            <p class="text-xs text-purple-300">${escapeHtml(c.name)}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-lg font-bold text-spooky-green">${c.votes}</span>
+                        <span class="text-xs text-gray-400 ml-1">vote(s)</span>
+                    </div>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        function createPodiumCard(contestant, rank) {
+            const card = document.createElement('div');
+            card.className = "w-full flex flex-col items-center text-center";
+
+            let heightClass = "h-32 sm:h-40 bg-gradient-to-t from-yellow-600/30 to-yellow-500/10 border-yellow-500/50";
+            let trophy = "🥇";
+            let title = "Spooktacular !";
+            let color = "text-yellow-400";
+
+            if (rank === 2) {
+                heightClass = "h-24 sm:h-32 bg-gradient-to-t from-slate-600/30 to-slate-400/10 border-slate-400/50";
+                trophy = "🥈";
+                title = "Creepy Classic";
+                color = "text-slate-300";
+            } else if (rank === 3) {
+                heightClass = "h-20 sm:h-24 bg-gradient-to-t from-amber-800/30 to-amber-600/10 border-amber-600/50";
+                trophy = "🥉";
+                title = "Boo-tiful";
+                color = "text-amber-400";
+            }
+
+            card.innerHTML = `
+                <div class="text-3xl sm:text-4xl mb-1 animate-bounce">${trophy}</div>
+                <div class="text-2xl sm:text-3xl mb-2">${contestant.avatarType === 'emoji' ? contestant.avatar : '🖼️'}</div>
+                <p class="text-xs sm:text-sm font-bold text-white truncate max-w-[90px] sm:max-w-[120px]">${escapeHtml(contestant.costume)}</p>
+                <p class="text-[10px] text-purple-300 truncate max-w-[80px]">${escapeHtml(contestant.name)}</p>
+                <div class="w-full mt-2 rounded-t-xl border-t border-x ${heightClass} flex flex-col items-center justify-center">
+                    <span class="text-lg sm:text-2xl font-black ${color}">${contestant.votes}</span>
+                    <span class="text-[10px] text-gray-400">votes</span>
+                </div>
+            `;
+            return card;
+        }
+
+        // --- SECTION 3: ADMIN VIEW ---
+        function renderAdminView() {
+            // Bouton verrouillage
+            const btnLock = document.getElementById('btn-toggle-lock');
+            if (state.isLocked) {
+                btnLock.className = "w-full py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center space-x-2 bg-green-900/40 text-green-300 border-green-600/50 hover:bg-green-800/60";
+                btnLock.innerHTML = `<i class="fa-solid fa-lock-open mr-1"></i> Déverrouiller le vote`;
+            } else {
+                btnLock.className = "w-full py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center space-x-2 bg-yellow-900/40 text-yellow-300 border-yellow-600/50 hover:bg-yellow-800/60";
+                btnLock.innerHTML = `<i class="fa-solid fa-lock mr-1"></i> Verrouiller / Stopper le vote`;
+            }
+
+            // Liste des inscrits en Admin
+            const adminList = document.getElementById('admin-contestant-list');
+            document.getElementById('admin-contestant-count').textContent = state.contestants.length;
+            adminList.innerHTML = '';
+
+            if (state.contestants.length === 0) {
+                adminList.innerHTML = `<p class="text-gray-400 text-xs py-2 text-center">Aucun inscrit pour le moment.</p>`;
+                return;
+            }
+
+            state.contestants.forEach(c => {
+                const item = document.createElement('div');
+                item.className = "py-3 flex items-center justify-between text-sm";
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">${c.avatarType === 'emoji' ? c.avatar : '🖼️'}</span>
+                        <div>
+                            <p class="font-bold text-white">${escapeHtml(c.costume)} <span class="text-xs font-normal text-purple-300">(${escapeHtml(c.name)})</span></p>
+                            <p class="text-xs text-gray-400">${c.votes} vote(s)</p>
+                        </div>
+                    </div>
+                    <button onclick="deleteContestant('${c.id}')" class="px-2.5 py-1 bg-red-900/40 hover:bg-red-800/60 text-red-300 border border-red-700/50 rounded-lg text-xs font-semibold transition">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                adminList.appendChild(item);
+            });
+        }
+
+        // Ajouter un candidat
+        function handleAddContestant(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('input-name');
+            const costumeInput = document.getElementById('input-costume');
+            const descInput = document.getElementById('input-desc');
+            const urlInput = document.getElementById('input-image-url');
+
+            let avatarVal = state.selectedEmoji;
+            if (state.avatarMode === 'url' && urlInput.value.trim() !== '') {
+                avatarVal = urlInput.value.trim();
+            }
+
+            const newContestant = {
+                id: 'c_' + Date.now(),
+                name: nameInput.value.trim(),
+                costume: costumeInput.value.trim(),
+                desc: descInput.value.trim(),
+                avatar: avatarVal,
+                avatarType: state.avatarMode,
+                votes: 0
+            };
+
+            state.contestants.push(newContestant);
+            saveContestants();
+
+            // Reset form
+            nameInput.value = '';
+            costumeInput.value = '';
+            descInput.value = '';
+            urlInput.value = '';
+
+            showToast("Nouveau costume inscrit avec succès !", "🎃");
+            renderAll();
+        }
+
+        // Supprimer un candidat
+        function deleteContestant(id) {
+            if (confirm("Voulez-vous vraiment supprimer ce costume ?")) {
+                state.contestants = state.contestants.filter(c => c.id !== id);
+                saveContestants();
+                renderAll();
+                showToast("Costume supprimé.", "🗑️");
+            }
+        }
+
+        // Verrouiller / Déverrouiller
+        function toggleVotingLock() {
+            state.isLocked = !state.isLocked;
+            localStorage.setItem('spooky_locked', state.isLocked);
+            renderAll();
+            showToast(state.isLocked ? "Les votes sont maintenant bloqués." : "Les votes sont ouverts !", state.isLocked ? "🔒" : "🔓");
+        }
+
+        // Changer max votes
+        function updateMaxVotes(val) {
+            state.maxVotesPerUser = parseInt(val, 10);
+            localStorage.setItem('spooky_max_votes', state.maxVotesPerUser);
+            renderVotingGrid();
+            showToast(`Limite fixée à ${state.maxVotesPerUser} vote(s) par personne`, "⚙️");
+        }
+
+        // Réinitialiser les votes
+        function confirmResetVotes() {
+            if (confirm("Êtes-vous sûr de vouloir remettre tous les votes à ZERO ?")) {
+                state.contestants.forEach(c => c.votes = 0);
+                saveContestants();
+                localStorage.removeItem('spooky_user_votes');
+                renderAll();
+                showToast("Tous les votes ont été réinitialisés !", "🔄");
+            }
+        }
+
+        // Effacer Tout
+        function confirmClearAll() {
+            if (confirm("ATTENTION : Cela va supprimer TOUS les candidats et TOUS les votes. Continuer ?")) {
+                state.contestants = [];
+                saveContestants();
+                localStorage.removeItem('spooky_user_votes');
+                renderAll();
+                showToast("Toutes les données ont été effacées.", "⚠️");
+            }
+        }
+
+        // --- GESTION DU QR CODE ---
+        function initQRCode() {
+            // URL directe pour voter
+            const currentUrl = window.location.href.split('?')[0];
+            const voteUrl = `${currentUrl}?mode=voter`;
+
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = "";
+
+            qrCodeObj = new QRCode(qrContainer, {
+                text: voteUrl,
+                width: 150,
+                height: 150,
+                colorDark : "#0f0a1c",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            // Modal QR
+            const modalTarget = document.getElementById("qrcode-modal-target");
+            modalTarget.innerHTML = "";
+            qrModalObj = new QRCode(modalTarget, {
+                text: voteUrl,
+                width: 260,
+                height: 260,
+                colorDark : "#0f0a1c",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+
+        function copyVoteUrl() {
+            const currentUrl = window.location.href.split('?')[0];
+            const voteUrl = `${currentUrl}?mode=voter`;
+            
+            // Fallback copy
+            const tempInput = document.createElement("input");
+            tempInput.value = voteUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            showToast("Lien de vote copié dans le presse-papier !", "📋");
+        }
+
+        function toggleFullScreenQR() {
+            const modal = document.getElementById('qr-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        // --- SÉLECTION AVATAR EMOJI / MODE ---
+        function setAvatarMode(mode) {
+            state.avatarMode = mode;
+            const btnEmoji = document.getElementById('btn-mode-emoji');
+            const btnUrl = document.getElementById('btn-mode-url');
+            const picker = document.getElementById('avatar-emoji-picker');
+            const inputUrl = document.getElementById('avatar-url-input');
+
+            if (mode === 'emoji') {
+                btnEmoji.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-800 text-white border border-purple-600";
+                btnUrl.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-spooky-dark text-gray-400 border border-purple-900";
+                picker.classList.remove('hidden');
+                inputUrl.classList.add('hidden');
+            } else {
+                btnUrl.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-800 text-white border border-purple-600";
+                btnEmoji.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-spooky-dark text-gray-400 border border-purple-900";
+                inputUrl.classList.remove('hidden');
+                picker.classList.add('hidden');
+            }
+        }
+
+        function selectEmoji(emoji) {
+            state.selectedEmoji = emoji;
+            const opts = document.querySelectorAll('.emoji-opt');
+            opts.forEach(el => {
+                if (el.textContent === emoji) {
+                    el.classList.add('bg-purple-700', 'border-spooky-orange');
+                } else {
+                    el.classList.remove('bg-purple-700', 'border-spooky-orange');
+                }
+            });
+        }
+
+        // --- EFFETS SECONDAIRES & UTILS ---
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 70,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#ff6600', '#8b00ff', '#00ff66', '#ffffff']
+                });
+            }
+        }
+
+        function showToast(message, icon = "🎃") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = message;
+            document.getElementById('toast-icon').textContent = icon;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "& my;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
